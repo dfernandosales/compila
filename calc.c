@@ -1,6 +1,6 @@
 #include "calc.h"
 
-int lines = 0;
+int errorLine;
 
 struct node *newNode() {
   struct node *nop = (struct node *)malloc(sizeof(struct node));
@@ -15,7 +15,6 @@ struct node *nodeInt(int value) {
   integer->type = type_int;
   integer->value_i = value;
   integer->value_f = FLT_MAX;
-
   return integer;
 }
 
@@ -34,6 +33,12 @@ struct node *nodeMathOp(enum type_op type, struct node *left,
   nodeMathOp->left = left;
   nodeMathOp->op = type;
   nodeMathOp->type = type_mathop;
+  if (type == type_div) {
+    if (right->value_f == 0 || right->value_i == 0) {
+      printf("%d\n",errorLine);
+      nodeMathOp->errorLine = errorLine;
+    }
+  }
   return nodeMathOp;
 }
 
@@ -62,6 +67,7 @@ struct node *nodeAssign(struct node *var, struct node *value) {
   novo->right = value;
   novo->value_f = FLT_MAX;
   novo->value_i = INT_MAX;
+  errorLine++;
   return novo;
 }
 
@@ -71,6 +77,7 @@ struct node *nodePrint(struct node *exp) {
   print->type = type_print;
   print->value_f = FLT_MAX;
   print->value_i = INT_MAX;
+  errorLine++;
   return print;
 }
 
@@ -81,7 +88,7 @@ struct node *nodeLink(struct node *expLeft, struct node *expRight) {
   link->type = type_link;
   link->value_f = FLT_MAX;
   link->value_i = INT_MAX;
-  lines++;
+  errorLine++;
   return link;
 }
 
@@ -170,7 +177,6 @@ struct node *executeTree2(struct symbols *symbols, struct node *curr) {
 
     if (left->type == right->type) {
       result->type = left->type;
-
       switch (curr->op) {
       case type_mul: {
         result->value_i = left->value_i * right->value_i;
@@ -180,7 +186,7 @@ struct node *executeTree2(struct symbols *symbols, struct node *curr) {
 
       case type_div: {
         if (right->value_f == 0 || right->value_i == 0) {
-          printf("Syntax error. Division by 0. at line %d\n", lines);
+          printf("error. division by 0 at line %d\n", curr->errorLine);
           return 0;
         }
         result->value_i = left->value_i / right->value_i;
@@ -242,8 +248,7 @@ struct node *executeTree2(struct symbols *symbols, struct node *curr) {
       //    break;
       //  }
       //  }
-      printf("Synax Error at line %d. Operation between differents types.\n",
-             lines);
+      printf("syntax error. Operation with different types.\n");
       return 0;
     }
 
@@ -291,8 +296,7 @@ struct node *executeTree2(struct symbols *symbols, struct node *curr) {
         s->value_i = resolved->value_i;
         s->value_f = resolved->value_f;
       } else {
-        printf("ATTRIBUTION TYPE ERROR: Variable ->%s at line %d\n",
-               curr->left->name, lines);
+        printf("ATTRIBUTION TYPE ERROR: Variable %s\n", curr->left->name);
         return NULL;
       }
     } else {
@@ -309,7 +313,7 @@ struct node *executeTree2(struct symbols *symbols, struct node *curr) {
     break;
 
   default:
-    printf("UNINPLEMENTED %d\n", curr->type);
+    printf("UNINPLEMENTED OPERATION\n");
     break;
   }
 }
@@ -335,7 +339,7 @@ struct symbol *get_symbol(struct symbols *symbols, char *name) {
       return curr;
     }
   }
-  printf("Symbol does not exist.\n");
+  printf("ERRO. symbol %s does not exist.\n", name);
   return NULL;
 }
 

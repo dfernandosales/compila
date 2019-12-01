@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdlib.h>
 #include <string.h>
 #include <float.h>
 #include <limits.h>
@@ -29,6 +30,7 @@ struct node {
   int value_i;
   float value_f;
   char name[32];
+  int errorLine;
 };
 
 struct symbol {

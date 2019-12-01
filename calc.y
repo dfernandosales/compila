@@ -6,7 +6,6 @@
 #include "calc.h"
 
 
-extern int lines;
 
 %}
 
