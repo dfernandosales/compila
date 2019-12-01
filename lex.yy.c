@@ -481,16 +481,14 @@ extern void update_location(void);
 
 extern int fileno(FILE *stream);
 
-#define YY_USER_ACTION update_location();
 
 #define YY_NO_INPUT
 #define YY_NO_UNPUT
 
 #include "gen.calc.tokens.h"
 
-int lines= 0;
-#line 493 "lex.yy.c"
-#line 494 "lex.yy.c"
+#line 491 "lex.yy.c"
+#line 492 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -707,10 +705,10 @@ YY_DECL
 		}
 
 	{
-#line 33 "calc.l"
+#line 31 "calc.l"
 
 
-#line 714 "lex.yy.c"
+#line 712 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -770,96 +768,96 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 35 "calc.l"
+#line 33 "calc.l"
 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 36 "calc.l"
+#line 34 "calc.l"
 
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 37 "calc.l"
+#line 35 "calc.l"
 
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 39 "calc.l"
+#line 37 "calc.l"
 { return PRINT; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 40 "calc.l"
+#line 38 "calc.l"
 { yylval.s = my_strdup(yytext); return IDENTIFIER; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 41 "calc.l"
+#line 39 "calc.l"
 { yylval.i = atoi(yytext); return NUMBERI; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 42 "calc.l"
+#line 40 "calc.l"
 { yylval.f = atof(yytext); return(NUMBERF); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 43 "calc.l"
+#line 41 "calc.l"
 { return '('; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 44 "calc.l"
+#line 42 "calc.l"
 { return ')'; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 45 "calc.l"
+#line 43 "calc.l"
 { return '='; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 46 "calc.l"
+#line 44 "calc.l"
 { return '-'; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 47 "calc.l"
+#line 45 "calc.l"
 { return '+'; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 48 "calc.l"
+#line 46 "calc.l"
 { return '*'; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 49 "calc.l"
+#line 47 "calc.l"
 { return '/'; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 50 "calc.l"
+#line 48 "calc.l"
 { return '^'; }
 	YY_BREAK
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 51 "calc.l"
+#line 49 "calc.l"
 { return '\n'; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 53 "calc.l"
+#line 51 "calc.l"
 
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 55 "calc.l"
+#line 53 "calc.l"
 ECHO;
 	YY_BREAK
-#line 863 "lex.yy.c"
+#line 861 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1864,7 +1862,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 55 "calc.l"
+#line 53 "calc.l"
 
 
 
@@ -1878,68 +1876,7 @@ char *my_strdup(const char *s) {
 }
 
 char *lex_filename = "";
-int lex_linenum = 1;
-int lex_colnum = 0;
 
-void update_location(void) {
-    for (char *s = yytext; *s != '\0'; s++) {
-        if (*s == '\n') { 
-            lex_colnum = 0;
-            lex_linenum++;
-        }
-        else if (*s == '\t') {
-            lex_colnum += 8 - (lex_colnum % 8);
-        }
-        else {
-            lex_colnum++;
-        }
-    }
-#if 0
-    ECHO;
-#endif
-}
-
-int parse_int(int skipNumChars, int radix) {
-    char *s = &(yytext[skipNumChars]);
-
-    for (int i = 0; s[i] != '\0'; i++) {
-        char c = s[i];
-
-        if (c == '_' || c == 'u' || c == 'b' || c == 's' || c == 'i' || c == 'l') {
-            char *t = my_strdup(s);
-
-            do {
-                if (c != '_') {
-                    t[i] = '\0';
-                    break;
-                }
-
-                int k = 0;
-
-                for (int j = 0; s[j] != '\0'; j++) {
-                    c = s[j];
-
-                    if (c == 'u' || c == 'b' || c == 's' || c == 'i' || c == 'l') {
-                        break;
-                    }
-
-                    if (s[j] != '_') {
-                        t[k++] = s[j];
-                    }
-                }
-
-                t[k] = '\0';
-            }
-            while (0);
-
-            int retval = (int) strtol(t, NULL, radix);
-            free(t);
-            return retval;
-        }
-    }
-
-    return (int) strtol(s, NULL, radix);
-}
 
 int parseStream(char *name, FILE *stream) {
     lex_filename = name;

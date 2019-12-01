@@ -20,12 +20,12 @@ extern int lines;
 %%
     
 program: 
-    lines { ;printTree($1.node, 0, 'T');  executeTree($1.node); }
+    lines { printTree($1.node, 0, 'T');  executeTree($1.node); }
     ;
 
 lines:
     statement { $$.node = $1.node; }
-    | statement '\n' lines {lines++;$$.node = nodeLink($1.node, $3.node); }
+    | statement '\n' lines {$$.node = nodeLink($1.node, $3.node); }
     ;
 
 statement:
@@ -46,9 +46,9 @@ assignment:
 expression:
     multiplication
         { $$.node = $1.node; }
-    | multiplication '+' multiplication
+    | multiplication '+' expression
         { $$.node = nodeMathOp(type_add, $1.node, $3.node); }
-    | multiplication '-' multiplication
+    | multiplication '-' expression
         { $$.node = nodeMathOp(type_sub, $1.node, $3.node); }
     ;
 
@@ -70,6 +70,7 @@ power:
 
 unary:
     atom
+        { $$.node = $1.node; }
     | '+' atom
         { $$.node = $2.node; }
     | '-' atom
@@ -100,6 +101,6 @@ struct identifier_node {
 struct identifier_node *identifiers_list = NULL;
 
 void yyerror (){
-  printf("Erro de sintaxe na linha %d \n", lines);
+  printf("ERROR sintatico");
   exit(0);
 }

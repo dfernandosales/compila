@@ -11,8 +11,7 @@ int parseFile(char *filename) {
     }
 
     int parseStatus = parseStream(filename, f);
-
-    printf("\nParse status = %s\n", getParseStatusName(parseStatus));
+    //printf("\nParse status = %s\n", getParseStatusName(parseStatus));
 
     fclose(f);
 

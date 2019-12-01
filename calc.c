@@ -1,8 +1,12 @@
 #include "calc.h"
 
+int lines = 0;
+
 struct node *newNode() {
   struct node *nop = (struct node *)malloc(sizeof(struct node));
   nop->type = type_nop;
+  nop->value_f = FLT_MAX;
+  nop->value_i = INT_MAX;
   return nop;
 }
 
@@ -10,6 +14,8 @@ struct node *nodeInt(int value) {
   struct node *integer = (struct node *)malloc(sizeof(struct node));
   integer->type = type_int;
   integer->value_i = value;
+  integer->value_f = FLT_MAX;
+
   return integer;
 }
 
@@ -17,6 +23,7 @@ struct node *nodeFloat(double value) {
   struct node *real = (struct node *)malloc(sizeof(struct node));
   real->type = type_float;
   real->value_f = value;
+  real->value_i = INT_MAX;
   return real;
 }
 
@@ -34,6 +41,8 @@ struct node *nodeVar(char *name) {
   struct node *var = (struct node *)malloc(sizeof(struct node));
   strcpy(var->name, name);
   var->type = type_var;
+  var->value_f = FLT_MAX;
+  var->value_i = INT_MAX;
   return var;
 }
 
@@ -41,6 +50,8 @@ struct node *nodeNeg(struct node *no) {
   struct node *neg = (struct node *)malloc(sizeof(struct node));
   neg->left = no;
   neg->type = type_neg;
+  neg->value_f = FLT_MAX;
+  neg->value_i = INT_MAX;
   return neg;
 }
 
@@ -49,6 +60,8 @@ struct node *nodeAssign(struct node *var, struct node *value) {
   novo->type = type_assign;
   novo->left = var;
   novo->right = value;
+  novo->value_f = FLT_MAX;
+  novo->value_i = INT_MAX;
   return novo;
 }
 
@@ -56,6 +69,8 @@ struct node *nodePrint(struct node *exp) {
   struct node *print = (struct node *)malloc(sizeof(struct node));
   print->left = exp;
   print->type = type_print;
+  print->value_f = FLT_MAX;
+  print->value_i = INT_MAX;
   return print;
 }
 
@@ -64,6 +79,9 @@ struct node *nodeLink(struct node *expLeft, struct node *expRight) {
   link->left = expLeft;
   link->right = expRight;
   link->type = type_link;
+  link->value_f = FLT_MAX;
+  link->value_i = INT_MAX;
+  lines++;
   return link;
 }
 
@@ -79,22 +97,40 @@ void printTree(struct node *root, int nivel, char side) {
       printf("%c:nop\n", side);
       break;
     case type_int:
-      printf("%c:int\n", side);
+      printf("%c: %d\n", side, root->value_i);
       break;
     case type_float:
-      printf("%c:float\n", side);
+      printf("%c: %.2f \n", side, root->value_f);
       break;
     case type_var:
-      printf("%c:var\n", side);
+      printf("%c: %s\n", side, root->name);
       break;
     case type_mathop:
-      printf("%c:mathop\n", side);
+      switch (root->op) {
+      case 0:
+        printf("%c: + \n", side);
+        break;
+      case 1:
+        printf("%c: - \n", side);
+        break;
+      case 2:
+        printf("%c: * \n", side);
+        break;
+      case 3:
+        printf("%c: / \n", side);
+        break;
+      case 4:
+        printf("%c: ^ \n", side);
+        break;
+      default:
+        break;
+      }
       break;
     case type_neg:
-      printf("%c:neg\n", side);
+      printf("%c: - \n", side);
       break;
     case type_assign:
-      printf("%c:=\n", side);
+      printf("%c: = \n", side);
       break;
     case type_print:
       printf("%c:print\n", side);
@@ -120,7 +156,6 @@ struct node *executeTree2(struct symbols *symbols, struct node *curr) {
     printf("Tree node is null.\n");
     return NULL;
   }
-
   switch (curr->type) {
 
   case type_link:
@@ -144,6 +179,10 @@ struct node *executeTree2(struct symbols *symbols, struct node *curr) {
       }
 
       case type_div: {
+        if (right->value_f == 0 || right->value_i == 0) {
+          printf("Syntax error. Division by 0. at line %d\n", lines);
+          return 0;
+        }
         result->value_i = left->value_i / right->value_i;
         result->value_f = left->value_f / right->value_f;
         break;
@@ -169,38 +208,43 @@ struct node *executeTree2(struct symbols *symbols, struct node *curr) {
       }
       }
     } else {
-      float lhs = left->type == type_int ? (float)left->value_i : left->value_f;
-      float rhs =
-          right->type == type_int ? (float)right->value_i : right->value_f;
+      // code to accept differents types of operations int + float = float
 
-      result->type = type_float;
+      //  float lhs = left->type == type_int ? (float)left->value_i :
+      //  left->value_f; float rhs =
+      //      right->type == type_int ? (float)right->value_i : right->value_f;
 
-      switch (curr->op) {
-      case type_mul: {
-        result->value_f = lhs * rhs;
-        break;
-      }
+      //  result->type = type_float;
 
-      case type_div: {
-        result->value_f = lhs / rhs;
-        break;
-      }
+      //  switch (curr->op) {
+      //  case type_mul: {
+      //    result->value_f = lhs * rhs;
+      //    break;
+      //  }
 
-      case type_add: {
-        result->value_f = lhs + rhs;
-        break;
-      }
+      //  case type_div: {
+      //    result->value_f = lhs / rhs;
+      //    break;
+      //  }
 
-      case type_sub: {
-        result->value_f = lhs - rhs;
-        break;
-      }
+      //  case type_add: {
+      //    result->value_f = lhs + rhs;
+      //    break;
+      //  }
 
-      case type_pow: {
-        result->value_f = (float)pow(lhs, rhs);
-        break;
-      }
-      }
+      //  case type_sub: {
+      //    result->value_f = lhs - rhs;
+      //    break;
+      //  }
+
+      //  case type_pow: {
+      //    result->value_f = (float)pow(lhs, rhs);
+      //    break;
+      //  }
+      //  }
+      printf("Synax Error at line %d. Operation between differents types.\n",
+             lines);
+      return 0;
     }
 
     return result;
@@ -247,7 +291,8 @@ struct node *executeTree2(struct symbols *symbols, struct node *curr) {
         s->value_i = resolved->value_i;
         s->value_f = resolved->value_f;
       } else {
-        printf("ATTRIBUTION TYPE ERROR: Variable ->%s\n",curr->left->name);
+        printf("ATTRIBUTION TYPE ERROR: Variable ->%s at line %d\n",
+               curr->left->name, lines);
         return NULL;
       }
     } else {
@@ -290,7 +335,7 @@ struct symbol *get_symbol(struct symbols *symbols, char *name) {
       return curr;
     }
   }
-  printf("Symbol do not exist.");
+  printf("Symbol does not exist.\n");
   return NULL;
 }
 
