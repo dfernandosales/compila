@@ -1602,6 +1602,6 @@ struct identifier_node {
 struct identifier_node *identifiers_list = NULL;
 
 void yyerror (){
-  printf("ERROR sintatico");
+  printf("Syntax error in input grammar.");
   exit(0);
 }

@@ -7,7 +7,9 @@ struct node *newNode() {
   nop->type = type_nop;
   nop->value_f = FLT_MAX;
   nop->value_i = INT_MAX;
+  errorLine++;
   return nop;
+
 }
 
 struct node *nodeInt(int value) {
@@ -33,11 +35,20 @@ struct node *nodeMathOp(enum type_op type, struct node *left,
   nodeMathOp->left = left;
   nodeMathOp->op = type;
   nodeMathOp->type = type_mathop;
-  if (type == type_div) {
-    if (right->value_f == 0 || right->value_i == 0) {
-      printf("%d\n",errorLine);
+  if (type == type_div && (right->value_f == 0 || right->value_i == 0)) {
       nodeMathOp->errorLine = errorLine;
-    }
+  }else if(type == type_mul && left->type != right->type){
+    nodeMathOp->errorLine = errorLine;
+  }else if(type == type_sub && left->type != right->type){
+    nodeMathOp->errorLine = errorLine;
+  }else if(type == type_add && left->type != right->type){
+    nodeMathOp->errorLine = errorLine;
+  }else if(type == type_mul && left->type != right->type){
+    nodeMathOp->errorLine = errorLine;
+  }else if(type == type_pow && left->type != right->type){
+    nodeMathOp->errorLine = errorLine;
+  }else if(type == type_div && left->type != right->type){
+    nodeMathOp->errorLine = errorLine;
   }
   return nodeMathOp;
 }
@@ -248,7 +259,7 @@ struct node *executeTree2(struct symbols *symbols, struct node *curr) {
       //    break;
       //  }
       //  }
-      printf("syntax error. Operation with different types.\n");
+      printf("Syntax error. Operation with different types. at line %d\n", curr->errorLine);
       return 0;
     }
 
